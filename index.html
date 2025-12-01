@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SportsConnect - Find Your Sports Buddy</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1e40af;
+            --secondary: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --border: #e5e7eb;
+            --text: #374151;
+            --text-light: #6b7280;
+            --shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--light);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .navbar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--primary);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--light);
+            border-radius: 8px;
+        }
+
+        .role-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .role-badge.admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .role-badge.coach {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .role-badge.user {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-success {
+            background: var(--secondary);
+            color: var(--white);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--white);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn.loading {
+            position: relative;
+            color: transparent;
+        }
+
+        .btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 50%;
+            left: 50%;
+            margin-left: -8px;
+            margin-top: -8px;
+            border: 2px solid var(--white);
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(135deg, var(--primary) 0%, #3b82f6 100%);
+            color: var(--white);
+            border-radius: 12px;
+            margin-bottom: 3rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card h3 {
+            color: var(--dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .card p {
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: var(--white);
+            border-radius: 12px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-header h2 {
+            color: var(--dark);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-bottom: -2px;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .alert {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .alert.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .alert.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid var(--danger);
+        }
+
+        .sport-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: var(--light);
+            border-radius: 20px;
+            font-size: 0.875rem;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-bar input,
+        .search-bar select {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .search-bar input {
+            flex: 1;
+        }
+
+        .rating {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .status-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-badge.pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-badge.approved {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status-badge.rejected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .spots-available {
+            color: var(--secondary);
+            font-weight: 600;
+        }
+
+        .spots-limited {
+            color: var(--warning);
+            font-weight: 600;
+        }
+
+        .spots-full {
+            color: var(--danger);
+            font-weight: 600;
+        }
+
+        .test-credentials {
+            background: #fef3c7;
+            border: 2px solid #fbbf24;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .test-credentials h4 {
+            color: #92400e;
+            margin-bottom: 1rem;
+        }
+
+        .test-credentials table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .test-credentials th,
+        .test-credentials td {
+            text-align: left;
+            padding: 0.5rem;
+            border-bottom: 1px solid #fbbf24;
+        }
+
+        .test-credentials th {
+            color: #92400e;
+            font-weight: 600;
+        }
+
+        .test-credentials td {
+            color: #78350f;
+            font-family: monospace;
+        }
+
+        .feature-card {
+            text-align: center;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .coach-info {
+            margin: 1rem 0;
+        }
+
+        .coach-info p {
+            margin: 0.5rem 0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state h3 {
+            color: var(--text);
+            margin-bottom: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <div class="logo">
+                <span>⚽</span>
+                <span>SportsConnect</span>
+            </div>
+            <div class="nav-links" id="navLinks"></div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div id="mainContent"></div>
+
+    <!-- Auth Modal -->
+    <div class="modal" id="authModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Welcome to SportsConnect</h2>
+                <button class="close-btn" onclick="closeModal('authModal')">&times;</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('login')">Login</button>
+                <button class="tab" onclick="switchTab('register')">Register</button>
+            </div>
+
+            <!-- Login Tab -->
+            <div class="tab-content active" id="loginTab">
+                <div class="test-credentials">
+                    <h4>🧪 Test Credentials</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Role</th>
+                                <th>Email</th>
+                                <th>Password</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Admin</td>
+                                <td>admin@sportsbuddy.com</td>
+                                <td>admin123</td>
+                            </tr>
+                            <tr>
+                                <td>User</td>
+                                <td>john@example.com</td>
+                                <td>user123</td>
+                            </tr>
+                            <tr>
+                                <td>Coach</td>
+                                <td>rahul@coach.com</td>
+                                <td>coach123</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="loginEmail" required placeholder="Enter your email">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="loginPassword" required placeholder="Enter your password">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginBtn">Login</button>
+                </form>
+            </div>
+
+            <!-- Register Tab -->
+            <div class="tab-content" id="registerTab">
+                <form id="registerForm">
+                    <div class="form-group"><label>Full Name</label><input type="text" id="regName" required
+                            placeholder="Enter your full name"></div>
+                    <div class="form-group"><label>Email</label><input type="email" id="regEmail" required
+                            placeholder="Enter your email"></div>
+                    <div class="form-group"><label>Password</label><input type="password" id="regPassword" required
+                            placeholder="Choose a password"></div>
+                    <div class="form-group"><label>Phone</label><input type="tel" id="regPhone" required
+                            placeholder="Enter your phone number"></div>
+                    <div class="form-group"><label>Location</label><input type="text" id="regLocation" required
+                            placeholder="City, State"></div>
+                    <div class="form-group"><label>Role</label>
+                        <select id="regRole" required>
+                            <option value="user">Regular User</option>
+                            <option value="coach">Coach</option>
+                        </select>
+                    </div>
+
+                    <div id="coachFields" style="display: none;">
+                        <div class="form-group"><label>Sports (comma separated)</label><input type="text" id="regSports"
+                                placeholder="e.g., Cricket, Tennis"></div>
+                        <div class="form-group"><label>Experience (years)</label><input type="number" id="regExperience"
+                                min="0" placeholder="Years of experience"></div>
+                        <div class="form-group"><label>Hourly Rate (₹)</label><input type="number" id="regRate" min="0"
+                                placeholder="Rate per hour"></div>
+                        <div class="form-group"><label>Bio</label><textarea id="regBio"
+                                placeholder="Tell us about yourself"></textarea></div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Booking Modal -->
+    <div class="modal" id="bookingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Book Coach Session</h2>
+                <button class="close-btn" onclick="closeModal('bookingModal')">&times;</button>
+            </div>
+            <form id="bookingForm">
+                <input type="hidden" id="bookingCoachId">
+                <div class="form-group"><label>Date</label><input type="date" id="bookingDate" required></div>
+                <div class="form-group"><label>Time</label><input type="time" id="bookingTime" required></div>
+                <div class="form-group"><label>Duration (hours)</label><input type="number" id="bookingDuration" min="1"
+                        max="8" required value="1"></div>
+                <div class="form-group"><label>Message (optional)</label><textarea id="bookingMessage"
+                        placeholder="Any specific requirements?"></textarea></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Send Booking Request</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Event Registration Modal -->
+    <div class="modal" id="eventRegModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Register for Event</h2>
+                <button class="close-btn" onclick="closeModal('eventRegModal')">&times;</button>
+            </div>
+            <form id="eventRegForm">
+                <input type="hidden" id="eventRegId">
+                <div class="form-group"><label>Team Name (optional)</label><input type="text" id="eventTeamName"
+                        placeholder="Your team name"></div>
+                <div class="form-group"><label>Notes (optional)</label><textarea id="eventNotes"
+                        placeholder="Any special requirements?"></textarea></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Create Event Modal -->
+    <div class="modal" id="createEventModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create New Event</h2>
+                <button class="close-btn" onclick="closeModal('createEventModal')">&times;</button>
+            </div>
+            <form id="createEventForm">
+                <div class="form-group"><label>Event Name</label><input type="text" id="eventName" required
+                        placeholder="Enter event name"></div>
+                <div class="form-group"><label>Sport</label>
+                    <select id="eventSport" required>
+                        <option value="">Select Sport</option>
+                        <option value="Cricket">Cricket</option>
+                        <option value="Football">Football</option>
+                        <option value="Basketball">Basketball</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Badminton">Badminton</option>
+                        <option value="Table Tennis">Table Tennis</option>
+                        <option value="Swimming">Swimming</option>
+                        <option value="Athletics">Athletics</option>
+                    </select>
+                </div>
+                <div class="form-group"><label>Date</label><input type="date" id="eventDate" required></div>
+                <div class="form-group"><label>Time</label><input type="time" id="eventTime" required></div>
+                <div class="form-group"><label>Location</label><input type="text" id="eventLocation" required
+                        placeholder="Venue address"></div>
+                <div class="form-group"><label>Capacity</label><input type="number" id="eventCapacity" required min="2"
+                        placeholder="Maximum participants"></div>
+                <div class="form-group"><label>Description</label><textarea id="eventDescription" required
+                        placeholder="Event details"></textarea></div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Create Event</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        /********************************************************************
+         * Updated frontend JS for SportsConnect (API-backed)
+         * - Uses API_BASE for backend URLs (default localhost:5000)
+         * - Stores JWT in sessionStorage under 'sc_token'
+         * - Exposes functions used by UI (openModal, closeModal, showView)
+         ********************************************************************/
+        const API_BASE = "http://localhost:5000"; // <-- change when deployed
+
+        let currentUser = null;
+        let users = [];
+        let events = [];
+        let bookings = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("App init");
+            setupEventListeners();
+            loadCurrentUserFromSession();
+            updateNavigation();
+            showView('home'); // default
+            loadEvents();     // preload events
+        });
+
+        function setupEventListeners() {
+            // Login form
+            document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await handleLogin();
+            });
+
+            // Register form
+            document.getElementById('registerForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await handleRegister();
+            });
+
+            // Role switch
+            document.getElementById('regRole').addEventListener('change', (e) => {
+                document.getElementById('coachFields').style.display = e.target.value === 'coach' ? 'block' : 'none';
+            });
+
+            // Booking form
+            document.getElementById('bookingForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await submitBooking();
+            });
+
+            // Event registration form (simplified - posts to your backend if you implement endpoint)
+            document.getElementById('eventRegForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                showAlert("Event registration support requires backend endpoint. Implement /events/register.", "error");
+            });
+
+            // Create event
+            document.getElementById('createEventForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await submitCreateEvent();
+            });
+        }
+
+        // ----------------------------
+        // Auth: Login & Register
+        // ----------------------------
+        async function renderMyBookingsPage() {
+            if (!sessionStorage.getItem('sc_token')) {
+                showAlert('Please login', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/bookings/user/${currentUser.id}`, {
+                    headers: {
+                        "Authorization": "Bearer " + sessionStorage.getItem('sc_token')
+                    }
+                });
+
+                const myBookings = await res.json();
+
+                let html = `
+            <div class="container">
+                <h2>My Booking Requests</h2>
+        `;
+
+                if (myBookings.length === 0) {
+                    html += `
+                <div class="empty-state">
+                    <h3>No bookings yet.</h3>
+                    <p>Book a coach to see your requests here!</p>
+                </div>
+            `;
+                } else {
+                    html += `<div class="grid">`;
+
+                    myBookings.forEach(b => {
+                        html += `
+                    <div class="card">
+                        <h3>${b.coachName}</h3>
+                        <p><strong>📅 Date:</strong> ${new Date(b.date).toLocaleDateString()}</p>
+                        <p><strong>⏰ Time:</strong> ${b.time}</p>
+                        <p><strong>⏱️ Duration:</strong> ${b.duration} hour(s)</p>
+                        <p><strong>Message:</strong> ${b.message || ''}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="status-badge ${b.status}">${b.status.toUpperCase()}</span>
+                        </p>
+                    </div>
+                `;
+                    });
+
+                    html += `</div>`;
+                }
+
+                html += `</div>`;
+
+                document.getElementById('mainContent').innerHTML = html;
+
+            } catch (error) {
+                console.error(error);
+                showAlert('Failed to load your bookings', 'error');
+            }
+        }
+
+        async function handleLogin() {
+            const loginBtn = document.getElementById('loginBtn');
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/login`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || "Login failed", "error");
+                    return;
+                }
+
+                sessionStorage.setItem('sc_token', data.token);
+                currentUser = data.user;
+                updateNavigation();
+                showAlert('Login successful!', 'success');
+                closeModal('authModal');
+                showView('coaches');
+            } catch (err) {
+                console.error(err);
+                showAlert('Login failed (network)', 'error');
+            } finally {
+                loginBtn.classList.remove('loading');
+                loginBtn.disabled = false;
+                document.getElementById('loginForm').reset();
+            }
+        }
+
+        async function handleRegister() {
+            const name = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const phone = document.getElementById('regPhone').value.trim();
+            const location = document.getElementById('regLocation').value.trim();
+            const role = document.getElementById('regRole').value;
+
+            const payload = { name, email, password, phone, location, role };
+
+            if (role === 'coach') {
+                const sportsInput = document.getElementById('regSports').value;
+                payload.sports = sportsInput;
+                payload.experience = parseInt(document.getElementById('regExperience').value) || 0;
+                payload.rate = parseInt(document.getElementById('regRate').value) || 0;
+                payload.bio = document.getElementById('regBio').value.trim();
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/auth/register`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || "Registration failed", "error");
+                    return;
+                }
+
+                showAlert("Registration successful! Please login.", "success");
+                switchTab('login');
+                document.getElementById('registerForm').reset();
+            } catch (err) {
+                console.error(err);
+                showAlert('Registration failed (network)', 'error');
+            }
+        }
+
+        // ----------------------------
+        // Load current user from sessionStorage (if token present)
+        // ----------------------------
+        function loadCurrentUserFromSession() {
+            const token = sessionStorage.getItem('sc_token');
+            if (!token) return;
+
+            // We trust backend to return user at login; but if the page reloads we can optionally call /users/me if backend exposes it.
+            // For now, we decode minimal info from stored state (not secure) OR fetch user list to find user by id.
+            // Safer approach: implement GET /auth/me on backend; for now we'll not attempt to decode JWT in frontend.
+
+            // As fallback: try to call a backend endpoint that returns profile (optional backend feature)
+            // Example (if implemented): fetch(`${API_BASE}/auth/me`, {headers: { Authorization: 'Bearer ' + token }})
+        }
+
+        // ----------------------------
+        // Navigation & Views
+        // ----------------------------
+        function updateNavigation() {
+            const navLinks = document.getElementById('navLinks');
+            if (!sessionStorage.getItem('sc_token') || !currentUser) {
+                navLinks.innerHTML = `
+                <a href="#" onclick="showView('home')">Home</a>
+                <a href="#" onclick="showView('coaches')">Coaches</a>
+                <a href="#" onclick="showView('events')">Events</a>
+                <button class="btn btn-primary btn-sm" onclick="openModal('authModal')">Login</button>
+            `;
+            } else {
+                let links = `
+                <a href="#" onclick="showView('coaches')">Coaches</a>
+                <a href="#" onclick="showView('events')">Events</a>
+                <a href="#" onclick="showView('buddies')">Find Buddy</a>
+            `;
+
+                if (currentUser.role === 'coach') links += `<a href="#" onclick="showView('requests')">My Requests</a>`;
+                if (currentUser.role === 'admin') links += `<a href="#" onclick="showView('manageEvents')">Manage Events</a>`;
+                if (currentUser.role === 'user') links += `<a href="#" onclick="showView('myBookings')">My Bookings</a>`;
+                
+
+                links += `
+                <div class="user-info">
+                    <span>${currentUser.name}</span>
+                    <span class="role-badge ${currentUser.role}">${currentUser.role}</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="logout()">Logout</button>
+            `;
+
+                navLinks.innerHTML = links;
+            }
+        }
+
+        function logout() {
+            sessionStorage.removeItem('sc_token');
+            currentUser = null;
+            updateNavigation();
+            showView('home');
+            showAlert('Logged out successfully', 'success');
+        }
+
+        function showView(viewName) {
+            const mainContent = document.getElementById('mainContent');
+
+            switch (viewName) {
+                case 'home':
+                    mainContent.innerHTML = renderHomeView();
+                    break;
+                case 'coaches':
+                    renderCoachesPage();
+                    break;
+                case 'events':
+                    renderEventsPage();
+                    break;
+                case 'buddies':
+                    mainContent.innerHTML = renderBuddiesView();
+                    setupBuddiesSearch();
+                    break;
+                case 'requests':
+                    if (sessionStorage.getItem('sc_token') && currentUser && currentUser.role === 'coach') {
+                        renderRequestsPage();
+                    } else {
+                        showAlert('Only coaches can view requests', 'error');
+                    }
+                    break;
+                case 'myBookings':
+                    renderMyBookingsPage();
+                    break;
+                case 'manageEvents':
+                    if (sessionStorage.getItem('sc_token') && currentUser && currentUser.role === 'admin') {
+                        renderManageEventsPage();
+                    } else {
+                        showAlert('Only admin can manage events', 'error');
+                    }
+                    break;
+                default:
+                    mainContent.innerHTML = renderHomeView();
+            }
+        }
+
+        function renderHomeView() {
+            return `
+            <div class="container">
+                <div class="hero">
+                    <h1>Welcome to SportsConnect</h1>
+                    <p>Find coaches, join events, and connect with sports buddies</p>
+                </div>
+                <div class="grid">
+                    <div class="card feature-card">
+                        <div class="feature-icon">👨‍🏫</div>
+                        <h3>Expert Coaches</h3>
+                        <p>Connect with certified coaches for personalized training</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">🏆</div>
+                        <h3>Sports Events</h3>
+                        <p>Join tournaments and competitions in your area</p>
+                    </div>
+                    <div class="card feature-card">
+                        <div class="feature-icon">🤝</div>
+                        <h3>Find Buddies</h3>
+                        <p>Connect with fellow sports enthusiasts near you</p>
+                    </div>
+                </div>
+            </div>
+        `;
+        }
+
+        // ----------------------------
+        // Events: load, render & search
+        // ----------------------------
+        async function loadEvents() {
+            try {
+                const res = await fetch(`${API_BASE}/events`);
+                if (!res.ok) throw new Error("Failed to fetch events");
+                events = await res.json();
+                console.log("Events loaded:", events.length);
+            } catch (err) {
+                console.error(err);
+                showAlert("Could not load events", "error");
+                events = [];
+            }
+        }
+
+        function renderEventsPage() {
+            const mainContent = document.getElementById('mainContent');
+
+            let gridHtml = events.map(event => {
+                const spotsLeft = event.capacity - (event.registered || 0);
+                const isFull = spotsLeft <= 0;
+                const spotsClass = isFull ? 'spots-full' : (spotsLeft <= 5 ? 'spots-limited' : 'spots-available');
+                const dateStr = new Date(event.date).toLocaleDateString();
+
+                let actionBtn = '';
+                if (currentUser) {
+                    if (isFull) actionBtn = `<button class="btn btn-secondary" disabled>Event Full</button>`;
+                    else actionBtn = `<button class="btn btn-primary" onclick="openEventRegModal(${event.id})">Register</button>`;
+                } else {
+                    actionBtn = `<button class="btn btn-secondary" onclick="openModal('authModal')">Login to Register</button>`;
+                }
+
+                return `
+                <div class="card" data-name="${event.name}" data-sport="${event.sport}">
+                    <div class="event-header">
+                        <span class="sport-badge">${event.sport}</span>
+                        <span class="${spotsClass}">${spotsLeft} spots left</span>
+                    </div>
+                    <h3>${event.name}</h3>
+                    <p><strong>📅 Date:</strong> ${dateStr} at ${event.time}</p>
+                    <p><strong>📍 Location:</strong> ${event.location}</p>
+                    <p><strong>👥 Capacity:</strong> ${event.capacity} (${event.registered || 0} registered)</p>
+                    <p>${event.description}</p>
+                    ${actionBtn}
+                </div>
+            `;
+            }).join('');
+
+            mainContent.innerHTML = `
+            <div class="container">
+                <h2>Upcoming Events</h2>
+                <div class="search-bar">
+                    <input type="text" id="eventSearch" placeholder="Search events...">
+                    <select id="eventSportFilter">
+                        <option value="">All Sports</option>
+                        <option value="Cricket">Cricket</option>
+                        <option value="Football">Football</option>
+                        <option value="Basketball">Basketball</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Badminton">Badminton</option>
+                    </select>
+                </div>
+                <div class="grid" id="eventsGrid">${gridHtml}</div>
+            </div>
+        `;
+
+            setupEventsSearch();
+        }
+
+        function setupEventsSearch() {
+            const searchInput = document.getElementById('eventSearch');
+            const sportFilter = document.getElementById('eventSportFilter');
+
+            function filterEvents() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedSport = sportFilter.value;
+                const cards = document.querySelectorAll('#eventsGrid .card');
+
+                cards.forEach(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const sport = card.dataset.sport;
+                    const matchesSearch = name.includes(searchTerm);
+                    const matchesSport = !selectedSport || sport === selectedSport;
+                    card.style.display = matchesSearch && matchesSport ? 'block' : 'none';
+                });
+            }
+
+            searchInput.addEventListener('input', filterEvents);
+            sportFilter.addEventListener('change', filterEvents);
+        }
+
+        // ----------------------------
+        // Coaches: list & search & booking
+        // ----------------------------
+        async function fetchAllUsers() {
+            try {
+                const res = await fetch(`${API_BASE}/users`);
+                if (!res.ok) throw new Error("Failed to fetch users");
+                users = await res.json();
+            } catch (err) {
+                console.error(err);
+                users = [];
+            }
+        }
+
+        async function renderCoachesPage() {
+            await fetchAllUsers();
+            const coaches = users.filter(u => u.role === 'coach');
+
+            let cardsHtml = coaches.map(coach => {
+                const sports = (coach.sports || "").split(',').map(s => s.trim()).filter(Boolean);
+                const rating = coach.rating || 5.0;
+                const exp = coach.experience || 0;
+                const rate = coach.rate || 0;
+
+                let action = '';
+                if (currentUser && currentUser.role === 'user') {
+                    action = `<button class="btn btn-primary" onclick="openBookingModal(${coach.id})">Book Session</button>`;
+                } else if (currentUser) {
+                    action = `<button class="btn btn-secondary" disabled>Only users can book</button>`;
+                } else {
+                    action = `<button class="btn btn-secondary" onclick="openModal('authModal')">Login to Book</button>`;
+                }
+
+                return `
+                <div class="card" data-name="${coach.name}" data-sports="${(coach.sports || '')}">
+                    <h3>${coach.name}</h3>
+                    <div class="coach-info">
+                        <p><strong>Sports:</strong> ${sports.map(s => `<span class="sport-badge">${s}</span>`).join('')}</p>
+                        <p><strong>Experience:</strong> ${exp} years</p>
+                        <p><strong>Rating:</strong> <span class="rating">⭐ ${rating}</span></p>
+                        <p><strong>Rate:</strong> ₹${rate}/hour</p>
+                        <p><strong>Location:</strong> ${coach.location || 'Not specified'}</p>
+                        <p>${coach.bio || ''}</p>
+                    </div>
+                    ${action}
+                </div>
+            `;
+            }).join('');
+
+            document.getElementById('mainContent').innerHTML = `
+            <div class="container">
+                <h2>Our Coaches</h2>
+                <div class="search-bar">
+                    <input type="text" id="coachSearch" placeholder="Search coaches...">
+                    <select id="coachSportFilter">
+                        <option value="">All Sports</option>
+                        <option value="Cricket">Cricket</option>
+                        <option value="Football">Football</option>
+                        <option value="Basketball">Basketball</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Badminton">Badminton</option>
+                    </select>
+                </div>
+                <div class="grid" id="coachesGrid">${cardsHtml}</div>
+            </div>
+        `;
+
+            setupCoachesSearch();
+        }
+
+        function setupCoachesSearch() {
+            const searchInput = document.getElementById('coachSearch');
+            const sportFilter = document.getElementById('coachSportFilter');
+
+            function filterCoaches() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedSport = sportFilter.value;
+                const cards = document.querySelectorAll('#coachesGrid .card');
+
+                cards.forEach(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const sports = card.dataset.sports.toLowerCase();
+                    const matchesSearch = name.includes(searchTerm);
+                    const matchesSport = !selectedSport || sports.includes(selectedSport.toLowerCase());
+                    card.style.display = matchesSearch && matchesSport ? 'block' : 'none';
+                });
+            }
+
+            searchInput.addEventListener('input', filterCoaches);
+            sportFilter.addEventListener('change', filterCoaches);
+        }
+
+        function openBookingModal(coachId) {
+            if (!sessionStorage.getItem('sc_token')) {
+                openModal('authModal');
+                return;
+            }
+            document.getElementById('bookingCoachId').value = coachId;
+            openModal('bookingModal');
+        }
+
+        async function submitBooking() {
+            if (!sessionStorage.getItem('sc_token')) {
+                showAlert('Please login to book', 'error');
+                return;
+            }
+
+            const coachId = parseInt(document.getElementById('bookingCoachId').value);
+            const date = document.getElementById('bookingDate').value;
+            const time = document.getElementById('bookingTime').value;
+            const duration = parseInt(document.getElementById('bookingDuration').value);
+            const message = document.getElementById('bookingMessage').value.trim();
+
+            try {
+                const res = await fetch(`${API_BASE}/bookings`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem('sc_token')
+                    },
+                    body: JSON.stringify({ coachId, date, time, duration, message })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || "Booking failed", "error");
+                    return;
+                }
+
+                showAlert("Booking request sent!", "success");
+                closeModal('bookingModal');
+                document.getElementById('bookingForm').reset();
+            } catch (err) {
+                console.error(err);
+                showAlert("Booking failed (network)", "error");
+            }
+        }
+
+        // ----------------------------
+        // Coach: view requests
+        // ----------------------------
+        async function renderRequestsPage() {
+            if (!sessionStorage.getItem('sc_token') || !currentUser) {
+                showAlert('Please login as coach', 'error');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_BASE}/bookings/coach/${currentUser.id}`, {
+                    headers: { "Authorization": "Bearer " + sessionStorage.getItem('sc_token') }
+                });
+                if (!res.ok) throw new Error("Failed");
+                bookings = await res.json();
+            } catch (err) {
+                console.error(err);
+                bookings = [];
+                showAlert("Could not load booking requests", "error");
+            }
+
+            let html = `<div class="container"><h2>My Booking Requests</h2>`;
+            if (!bookings.length) {
+                html += `
+                <div class="empty-state">
+                    <h3>No booking requests yet</h3>
+                    <p>When users book your coaching sessions, they will appear here</p>
+                </div>
+            `;
+            } else {
+                html += `<div class="grid">`;
+                bookings.forEach(req => {
+                    html += `
+                    <div class="card">
+                        <div class="event-header">
+                            <h3>${req.userName || ('User ' + req.userId)}</h3>
+                            <span class="status-badge ${req.status}">${req.status}</span>
+                        </div>
+                        <p><strong>📅 Date:</strong> ${new Date(req.date).toLocaleDateString()}</p>
+                        <p><strong>⏰ Time:</strong> ${req.time}</p>
+                        <p><strong>⏱️ Duration:</strong> ${req.duration} hour(s)</p>
+                        ${req.message ? `<p><strong>Message:</strong> ${req.message}</p>` : ''}
+                        ${req.status === 'pending' ? `
+                            <div class="action-buttons">
+                                <button class="btn btn-success" onclick="updateBookingStatus(${req.id}, 'approved')">Accept</button>
+                                <button class="btn btn-danger" onclick="updateBookingStatus(${req.id}, 'rejected')">Reject</button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                });
+                html += `</div>`;
+            }
+            html += `</div>`;
+
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        async function updateBookingStatus(bookingId, status) {
+            // Note: backend must implement endpoint to update booking status. Example: PUT /bookings/:id
+            try {
+                const res = await fetch(`${API_BASE}/bookings/${bookingId}`, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem('sc_token')
+                    },
+                    body: JSON.stringify({ status })
+                });
+
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || "Update failed", "error");
+                    return;
+                }
+                showAlert(`Booking ${status}!`, "success");
+                renderRequestsPage();
+            } catch (err) {
+                console.error(err);
+                showAlert("Update failed (network)", "error");
+            }
+        }
+
+        // ----------------------------
+        // Manage events (admin)
+        // ----------------------------
+        async function submitCreateEvent() {
+            if (!sessionStorage.getItem('sc_token') || !currentUser) {
+                showAlert('Please login as admin', 'error');
+                return;
+            }
+
+            const payload = {
+                name: document.getElementById('eventName').value.trim(),
+                sport: document.getElementById('eventSport').value,
+                date: document.getElementById('eventDate').value,
+                time: document.getElementById('eventTime').value,
+                location: document.getElementById('eventLocation').value.trim(),
+                capacity: parseInt(document.getElementById('eventCapacity').value),
+                description: document.getElementById('eventDescription').value.trim()
+            };
+
+            try {
+                const res = await fetch(`${API_BASE}/events`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer " + sessionStorage.getItem('sc_token')
+                    },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    showAlert(data.message || "Create event failed", "error");
+                    return;
+                }
+                showAlert("Event created successfully!", "success");
+                closeModal('createEventModal');
+                document.getElementById('createEventForm').reset();
+                await loadEvents();
+                showView('manageEvents');
+            } catch (err) {
+                console.error(err);
+                showAlert("Create event failed (network)", "error");
+            }
+        }
+
+        function renderManageEventsPage() {
+            const html = `
+            <div class="container">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;">
+                    <h2>Manage Events</h2>
+                    <button class="btn btn-primary" onclick="openModal('createEventModal')">Create New Event</button>
+                </div>
+                <div class="grid">
+                    ${events.map(e => `
+                        <div class="card">
+                            <div class="event-header">
+                                <span class="sport-badge">${e.sport}</span>
+                                <span>${e.registered || 0}/${e.capacity}</span>
+                            </div>
+                            <h3>${e.name}</h3>
+                            <p><strong>Date:</strong> ${new Date(e.date).toLocaleDateString()} at ${e.time}</p>
+                            <p><strong>Location:</strong> ${e.location}</p>
+                            <p>${e.description}</p>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+            document.getElementById('mainContent').innerHTML = html;
+        }
+
+        // ----------------------------
+        // Buddies (client-side)
+        // ----------------------------
+        function renderBuddiesView() {
+            const buddies = users.filter(u => u.role === 'user' && (!currentUser || u.id !== currentUser.id));
+
+            let html = `
+            <div class="container">
+                <h2>Find Sports Buddies</h2>
+                <div class="search-bar">
+                    <input type="text" id="buddySearch" placeholder="Search by name or location...">
+                    <select id="buddySportFilter">
+                        <option value="">All Sports</option>
+                        <option value="Cricket">Cricket</option>
+                        <option value="Football">Football</option>
+                        <option value="Basketball">Basketball</option>
+                        <option value="Tennis">Tennis</option>
+                        <option value="Badminton">Badminton</option>
+                    </select>
+                </div>
+                <div class="grid" id="buddiesGrid">
+                    ${buddies.map(buddy => `
+                        <div class="card" data-name="${buddy.name}" data-location="${buddy.location || ''}" data-sports="${buddy.sports || ''}">
+                            <h3>${buddy.name}</h3>
+                            <p><strong>📍 Location:</strong> ${buddy.location || 'Not specified'}</p>
+                            <p><strong>⚽ Sports:</strong> ${(buddy.sports || 'Not specified')}</p>
+                            ${currentUser ? `<button class="btn btn-primary" onclick="connectBuddy('${buddy.name}')">Connect</button>` : `<button class="btn btn-secondary" onclick="openModal('authModal')">Login to Connect</button>`}
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+            return html;
+        }
+
+        function setupBuddiesSearch() {
+            const searchInput = document.getElementById('buddySearch');
+            const sportFilter = document.getElementById('buddySportFilter');
+
+            function filterBuddies() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const selectedSport = sportFilter.value;
+                const cards = document.querySelectorAll('#buddiesGrid .card');
+
+                cards.forEach(card => {
+                    const name = card.dataset.name.toLowerCase();
+                    const location = card.dataset.location.toLowerCase();
+                    const sports = card.dataset.sports.toLowerCase();
+                    const matchesSearch = name.includes(searchTerm) || location.includes(searchTerm);
+                    const matchesSport = !selectedSport || sports.includes(selectedSport.toLowerCase());
+                    card.style.display = matchesSearch && matchesSport ? 'block' : 'none';
+                });
+            }
+
+            searchInput.addEventListener('input', filterBuddies);
+            sportFilter.addEventListener('change', filterBuddies);
+        }
+
+        function connectBuddy(name) {
+            showAlert(`Connection request sent to ${name}!`, 'success');
+        }
+
+        // ----------------------------
+        // Generic modals & alerts
+        // ----------------------------
+        function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            // event.target isn't available here; rather find the tab button by text
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.textContent.trim().toLowerCase() === tabName) { t.classList.add('active'); }
+            });
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function showAlert(message, type = 'success') {
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+            document.body.appendChild(alert);
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        // ----------------------------
+        // Utility: open event reg modal
+        // ----------------------------
+        function openEventRegModal(eventId) {
+            document.getElementById('eventRegId').value = eventId;
+            openModal('eventRegModal');
+        }
+
+        // ----------------------------
+        // Small UX: allow pressing Enter in login to submit
+        // ----------------------------
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                // If auth modal is open and login tab is active -> submit login
+                const auth = document.getElementById('authModal');
+                if (auth.classList.contains('active')) {
+                    const loginTab = document.getElementById('loginTab');
+                    if (loginTab.classList.contains('active')) {
+                        document.getElementById('loginForm').dispatchEvent(new Event('submit', { cancelable: true }));
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>
